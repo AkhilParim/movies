@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Movie from './Movie';
 import NominatedCard from './NominatedCard';
 import Swal from 'sweetalert2';
@@ -12,23 +12,38 @@ function EmptySearch() {
 function SearchResults(props) {
     return <h1>Showing results for "{props.name}"</h1>
 }
+const LocalState = list => {
+
+  const [selected, setSelected] = React.useState(
+    localStorage.getItem(list) ? JSON.parse(localStorage.getItem(list)) : []
+  );
+
+  React.useEffect(() => {
+    localStorage.setItem(list, JSON.stringify(selected));
+  }, [selected]);
+
+  console.log(localStorage.getItem(list));
+
+  return [selected, setSelected];
+};
 
 function App() {
   const [movies, setMovies] = useState([]);
+  const [selected, setSelected] = LocalState (
+    'list'
+  );
+
   const [searchTerm, setSearchTerm] = useState('');
   const [error, setError] = useState('');
 
 const handleOnSubmit = (e) => {
   const searchField = document.getElementById("search").value;
   setSearchTerm(searchField);
-  console.log("searchTerm");
-  console.log(searchTerm);
 
   if(searchField) {
     fetch(SEARCH_API + searchField)
     .then(res => res.json())
     .then(data => {
-      console.log(data.Search);
       if(typeof(data.Search) === 'undefined'){
         setError(data.Error);
       } else {
@@ -43,14 +58,10 @@ const handleOnSubmit = (e) => {
 
 
 {/****************  Movie Comp  *****************/}
-const [selected, setSelected] = useState([]);
 
 function addNomination(e) {
   const newSelected = selected.concat(e);
-  console.log("newSelected");
-  console.log(newSelected);
   setSelected(newSelected);
-  console.log(selected);
 if(selected.length == 4) {
     popup();
   }
@@ -81,13 +92,6 @@ function popup() {
       })
    )
  }
-{/* function loader() {
-     setTimeout(() => {
-       return <p>Loading</p>
-     }, 5000
-   );
- }
-*/}
 
   return (
     <>
@@ -114,10 +118,10 @@ function popup() {
               </>
             )
           } else {
-            return (
-              <div className="movie-container">
-                {searchTerm.length > 0 && movies.map((movie, index) => <Movie key={index} {...movie} nominated={addNomination} list={selected} /> )}
-              </div>
+            return(
+                <div className="movie-container">
+                  {searchTerm.length > 0 && movies.map((movie, index) => <Movie key={index} {...movie} nominated={addNomination} list={selected} /> )}
+                </div>
             )
           }
         })()}
