@@ -1,16 +1,17 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, Component } from 'react';
 import Movie from './Movie';
 import NominatedCard from './NominatedCard';
 import Swal from 'sweetalert2';
+import MovieImg from '../mov.svg';
 import "../index.css";
 
 const SEARCH_API = "https://www.omdbapi.com/?apikey=ef1a2d95&s="
 
 function EmptySearch() {
-    return <h1>Search a movie to show results..</h1>
+    return <h2>Search a movie to show results..</h2>
 }
 function SearchResults(props) {
-    return <h1>Showing results for "{props.name}"</h1>
+    return <h2>Showing results for "{props.name}"</h2>
 }
 const LocalState = list => {
 
@@ -98,7 +99,7 @@ function popup() {
     <header>
     <h1 className="title">Shopify Awards</h1>
     <form onSubmit={handleOnSubmit}>
-      <input placeholder="Search.." type="search" className="search" id="search" />
+      <input placeholder="Search.." type="search" className="search" id="search" onChange/>
       <button className="search-btn" onClick={handleOnSubmit}>Search</button>
     </form>
     </header>
@@ -110,11 +111,15 @@ function popup() {
           {searchTerm.length == 0 && <EmptySearch />}
         </div>
         {(() => {
-          if(searchTerm.length > 0 && error.length > 0) {
+          if(searchTerm.length == 0) {
+            return (
+              <img src={MovieImg} className="movieImg" />
+            )
+          } else if(searchTerm.length > 0 && error.length > 0) {
             return (
                 <>
-                  <p className="nom-inst">{error}</p>
-                  <p className="nom-inst">Search for another movie!</p>
+                  <p className="nom-inst less">{error}</p>
+                  <p className="nom-inst less">Search for another movie!</p>
               </>
             )
           } else {
