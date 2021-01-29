@@ -9,7 +9,7 @@ function Movie(props) {
           <img className="movie-img" src={props.Poster != "N/A" ? props.Poster : "https://res.cloudinary.com/people-matters/image/upload/q_auto,f_auto/v1517845732/1517845731.jpg"} alt={props.Title} />
           <div className="movie-info">
             <h3>{props.Title}</h3>
-            <span class="year">{props.Year}</span>
+            <span className="year">{props.Year}</span>
           </div>
         </div>
         <div className="nominate-div">

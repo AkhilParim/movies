@@ -1,7 +1,9 @@
 import React, { useEffect, useState, Component } from 'react';
 import Movie from './Movie';
 import NominatedCard from './NominatedCard';
+import Loading from './Loading';
 import Swal from 'sweetalert2';
+import axios from "axios";
 import MovieImg from '../mov.svg';
 import "../index.css";
 
@@ -23,7 +25,7 @@ const LocalState = list => {
     localStorage.setItem(list, JSON.stringify(selected));
   }, [selected]);
 
-  console.log(localStorage.getItem(list));
+  // console.log(localStorage.getItem(list));
 
   return [selected, setSelected];
 };
@@ -37,25 +39,69 @@ function App() {
   const [searchTerm, setSearchTerm] = useState('');
   const [error, setError] = useState('');
 
+// const handleOnSubmit = (e) => {
+//   const searchField = document.getElementById("search").value;
+//   setSearchTerm(searchField);
+//
+//   if(searchField) {
+//     fetch(SEARCH_API + searchField)
+//     .then(res => res.json())
+//     .then(data => {
+//       if(typeof(data.Search) === 'undefined'){
+//         setError(data.Error);
+//       } else {
+//         setMovies(data.Search);
+//         setError('');
+//       }
+//     });
+//   // });
+//   }
+//
+//   e.preventDefault();
+// };
+
 const handleOnSubmit = (e) => {
+  e.preventDefault();
   const searchField = document.getElementById("search").value;
   setSearchTerm(searchField);
+  setMovies([]);
 
   if(searchField) {
-    fetch(SEARCH_API + searchField)
-    .then(res => res.json())
-    .then(data => {
-      if(typeof(data.Search) === 'undefined'){
-        setError(data.Error);
-      } else {
-        setMovies(data.Search);
-        setError('');
-      }
-    });
+    // fetch(SEARCH_API + searchField)
+    // .then(res => res.json())
+    // .then(data => {
+    //   if(typeof(data.Search) === 'undefined'){
+    //     setError(data.Error);
+    //   } else {
+    //     setMovies(data.Search);
+    //     setError('');
+    //   }
+    // });
+    fetchData(searchField);
   }
 
-  e.preventDefault();
 };
+
+  const fetchData = async (searchField) => {
+    try {
+      setTimeout(() => {
+          fetch(SEARCH_API + searchField)
+            .then(res => res.json())
+            .then(data => {
+              if(typeof(data.Search) === 'undefined'){
+                setError(data.Error);
+              } else {
+                setMovies(data.Search);
+                // console.log(movies);
+                setError('');
+              }
+            });
+      }, 500);
+    } catch (e) {
+      console.log(e);
+    }
+  }
+
 
 
 {/****************  Movie Comp  *****************/}
@@ -72,6 +118,7 @@ function removeNomination(e) {
   const newSelected = selected.filter((item) => item !== e);
   setSelected(newSelected);
 }
+
 function popup() {
    return (
       Swal.fire({
@@ -113,13 +160,21 @@ function popup() {
         {(() => {
           if(searchTerm.length == 0) {
             return (
-              <img src={MovieImg} className="movieImg" />
+              <div class="starting-img">
+                <img src={MovieImg} className="movieImg" />
+              </div>
             )
           } else if(searchTerm.length > 0 && error.length > 0) {
             return (
                 <>
                   <p className="nom-inst less">{error}</p>
                   <p className="nom-inst less">Search for another movie!</p>
+                </>
+            )
+          } else if(searchTerm.length > 0 && movies.length == 0) {
+            return (
+              <>
+                {<Loading />}
               </>
             )
           } else {
@@ -128,6 +183,13 @@ function popup() {
                   {searchTerm.length > 0 && movies.map((movie, index) => <Movie key={index} {...movie} nominated={addNomination} list={selected} /> )}
                 </div>
             )
+
+
+            // return(
+            //     <div className="movie-container">
+            //       {searchTerm.length > 0 && movies.map((movie, index) => <Movie key={index} {...movie} nominated={addNomination} list={selected} /> )}
+            //     </div>
+            //     )
           }
         })()}
 
